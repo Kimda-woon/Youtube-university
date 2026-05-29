@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>유튜브 대학 · 내 강의 서재</title>
+<style>
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css");
+:root{
+  --bg:#f5f4ee; --sidebar:#efece2; --surface:#ffffff; --surface-2:#faf9f4;
+  --border:#e3ded0; --border-soft:#ece8dc; --text:#262420; --muted:#7c766a;
+  --accent:#cc7a56; --accent-weak:#f3e2d9; --accent-ink:#a8542f; --star:#c98a2b;
+  --radius:14px;
+  --sans:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{margin:0; background:var(--bg); color:var(--text); font-family:var(--sans);
+  line-height:1.75; font-size:15.5px; letter-spacing:-.003em; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;}
+.app{display:flex; min-height:100vh;}
+.side{width:316px; flex:0 0 316px; background:var(--sidebar); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; height:100vh; position:sticky; top:0;}
+.brand{padding:20px 20px 12px;}
+.brand .logo{font-size:1.22rem; font-weight:700; letter-spacing:-.02em;}
+.brand .sub{color:var(--muted); font-size:.78rem; margin-top:2px;}
+.search-wrap{padding:0 16px 10px;}
+.search{width:100%; padding:10px 12px 10px 34px; border-radius:10px; border:1px solid var(--border);
+  background:var(--surface); color:var(--text); font-size:.9rem; outline:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237c766a' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:11px center;}
+.search:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak);}
+.cats{display:flex; flex-wrap:wrap; gap:6px; padding:0 16px 8px;}
+.cat-chip{font-size:.74rem; padding:4px 10px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface); color:var(--muted); transition:.12s; user-select:none;}
+.cat-chip:hover{border-color:var(--accent);}
+.cat-chip.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+.count{padding:2px 18px 8px; color:var(--muted); font-size:.74rem;}
+.list{flex:1; overflow-y:auto; padding:4px 10px 18px;}
+.item{display:flex; gap:10px; padding:9px 10px; border-radius:11px; cursor:pointer; border:1px solid transparent; transition:.12s; margin-bottom:3px;}
+.item:hover{background:var(--surface);}
+.item.active{background:var(--surface); border-color:var(--border); box-shadow:0 1px 3px rgba(60,50,30,.05);}
+.item .thumb{flex:0 0 64px; width:64px; height:40px; border-radius:7px; object-fit:cover; background:#ddd6c6; border:1px solid var(--border-soft);}
+.item .it-body{min-width:0;}
+.item .it-title{font-size:.85rem; font-weight:600; line-height:1.32; color:var(--text); display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
+.item .it-meta{font-size:.7rem; color:var(--muted); margin-top:3px; display:flex; gap:6px; align-items:center; flex-wrap:wrap;}
+.dot-cat{display:inline-block; padding:1px 7px; border-radius:999px; background:var(--accent-weak); color:var(--accent-ink); font-weight:600;}
+.empty-list{color:var(--muted); font-size:.85rem; text-align:center; padding:30px 16px;}
+.main{flex:1; min-width:0; height:100vh; overflow-y:auto;}
+.main-inner{max-width:880px; margin:0 auto; padding:30px 40px 80px;}
+.welcome{max-width:560px; margin:14vh auto; text-align:center; color:var(--muted);}
+.welcome h2{color:var(--text); font-size:1.5rem; margin-bottom:8px;}
+.detail-head h1{font-size:1.74rem; line-height:1.32; letter-spacing:-.022em; margin:0 0 12px; font-weight:700;}
+.row-meta{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px;}
+.badge{padding:3px 12px; border-radius:999px; font-size:.78rem; font-weight:600; background:var(--accent); color:#fff;}
+.meta-text{color:var(--muted); font-size:.83rem;}
+.tags{margin:4px 0 18px; display:flex; flex-wrap:wrap; gap:6px;}
+.tag{font-size:.76rem; padding:3px 11px; border-radius:999px; background:var(--surface); border:1px solid var(--border); color:var(--accent-ink);}
+.ext-link{color:var(--accent-ink); font-size:.83rem; text-decoration:none;}
+.ext-link:hover{text-decoration:underline;}
+.video-box{position:relative; padding-top:56.25%; border-radius:var(--radius); overflow:hidden; background:#000;
+  border:1px solid var(--border); margin-bottom:18px; box-shadow:0 6px 22px rgba(60,50,30,.08);}
+.video-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0;}
+.poster{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; background-size:cover; background-position:center; text-decoration:none; cursor:pointer;}
+.poster::before{content:""; position:absolute; inset:0; background:rgba(20,16,10,.40); transition:.15s;}
+.poster:hover::before{background:rgba(20,16,10,.28);}
+.play-badge{position:relative; width:64px; height:64px; border-radius:50%; background:rgba(204,122,86,.96);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:1.4rem; padding-left:4px; box-shadow:0 4px 16px rgba(0,0,0,.35);}
+.poster-note{position:relative; color:#fff; font-weight:600; font-size:.92rem; text-shadow:0 1px 5px rgba(0,0,0,.6);}
+.player-hint{font-size:.82rem; color:#7a5436; margin:-8px 0 16px; padding:9px 13px; background:var(--accent-weak); border:1px solid #ecd3c5; border-radius:9px; line-height:1.55;}
+.player-hint code{background:#fff; padding:1px 7px; border-radius:5px; border:1px solid var(--border); font-size:.88em;}
+.tabs{display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:16px;}
+.tab-btn{padding:9px 15px; border:0; background:none; cursor:pointer; font-family:inherit; font-size:.92rem;
+  color:var(--muted); font-weight:600; border-bottom:2px solid transparent; margin-bottom:-1px; transition:.12s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.on{color:var(--accent-ink); border-bottom-color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.on{display:block;}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 22px; margin-bottom:16px;}
+.card h2{font-size:1.06rem; margin:0 0 12px; font-weight:700; letter-spacing:-.01em; display:flex; align-items:center; gap:8px;}
+.oneliner{font-size:1.16rem; font-weight:600; line-height:1.55; color:var(--accent-ink); background:var(--accent-weak);
+  border:1px solid #ecd3c5; border-radius:12px; padding:16px 18px; margin-bottom:16px;}
+.summary{white-space:pre-wrap; color:#34302a;}
+.explainer{background:#fbfaf6;}
+.prose{color:#33302a; font-size:1.0rem;}
+.prose p{margin:0 0 13px;} .prose p:last-child{margin-bottom:0;}
+.insight{white-space:pre-wrap; border-left:3px solid var(--accent); padding-left:15px; color:#3a342c;}
+dl.concepts{margin:0;}
+dl.concepts>div{padding:11px 0; border-bottom:1px solid var(--border-soft);}
+dl.concepts>div:last-child{border-bottom:0; padding-bottom:0;}
+dl.concepts>div:first-child{padding-top:0;}
+dl.concepts dt{font-weight:700; color:var(--text); margin-bottom:3px;}
+dl.concepts dd{margin:0; color:#4a463f;}
+ol.logic{margin:0; padding:0; counter-reset:lg; list-style:none;}
+ol.logic li{position:relative; padding:7px 0 7px 36px; counter-increment:lg;}
+ol.logic li::before{content:counter(lg); position:absolute; left:0; top:7px; width:24px; height:24px; border-radius:50%;
+  background:var(--accent); color:#fff; font-size:.78rem; font-weight:700; display:flex; align-items:center; justify-content:center;}
+ol.logic li:not(:last-child)::after{content:""; position:absolute; left:11px; top:31px; bottom:-1px; width:2px; background:var(--border);}
+ul{list-style:none; padding:0; margin:0;}
+ul.bullets li{position:relative; padding:5px 0 5px 18px; color:#33302a;}
+ul.bullets li::before{content:"•"; position:absolute; left:2px; color:var(--accent); font-weight:700;}
+.qhint{color:var(--muted); font-size:.84rem; margin:0 0 10px;}
+ol.review{margin:0; padding-left:21px; color:#33302a;}
+ol.review li{padding:5px 0;}
+.jump,.tline{width:100%; text-align:left; display:flex; gap:13px; align-items:flex-start; background:var(--surface-2);
+  border:1px solid var(--border-soft); color:var(--text); padding:11px 13px; border-radius:10px; cursor:pointer;
+  transition:.13s; margin-bottom:7px; font-family:inherit; font-size:inherit;}
+.jump:hover,.tline:hover{border-color:var(--accent); background:#fff; transform:translateX(2px);}
+.jump.hl{background:#fbf2e6;}
+.jump.hl:hover{border-color:var(--star);}
+.ts{flex:0 0 auto; font-variant-numeric:tabular-nums; color:var(--accent-ink); font-weight:700; min-width:52px; font-size:.86rem; padding-top:1px;}
+.ts.star{color:var(--star); min-width:66px;}
+.ch-body{display:flex; flex-direction:column;}
+.ch-body strong{font-weight:600;}
+.desc,.reason{color:var(--muted); font-size:.85rem; margin-top:2px;}
+.reason{color:#a07b3a;}
+.empty{color:var(--muted); font-size:.88rem;}
+.tsearch{width:100%; padding:9px 12px; border-radius:9px; border:1px solid var(--border); background:var(--surface-2);
+  font-family:inherit; font-size:.88rem; outline:none; margin-bottom:12px;}
+.tsearch:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-weak);}
+.tline .tts{flex:0 0 auto; min-width:50px; color:var(--accent-ink); font-weight:700; font-size:.82rem; font-variant-numeric:tabular-nums;}
+.tlist{max-height:62vh; overflow-y:auto; padding-right:4px;}
+.tline.hide{display:none;}
+.foot{color:var(--muted); font-size:.74rem; text-align:center; margin-top:26px;}
+.list::-webkit-scrollbar,.main::-webkit-scrollbar,.tlist::-webkit-scrollbar{width:9px;}
+.list::-webkit-scrollbar-thumb,.main::-webkit-scrollbar-thumb,.tlist::-webkit-scrollbar-thumb{background:#d8d2c2; border-radius:9px;}
+.menu-btn{display:none;}
+@media (max-width:860px){
+  .side{position:fixed; z-index:30; left:0; top:0; transform:translateX(-100%); transition:transform .22s; box-shadow:2px 0 24px rgba(0,0,0,.16);}
+  .side.open{transform:translateX(0);}
+  .main-inner{padding:60px 18px 60px;}
+  .menu-btn{display:inline-flex; position:fixed; top:14px; left:14px; z-index:20; background:var(--surface);
+    border:1px solid var(--border); border-radius:10px; width:40px; height:40px; align-items:center; justify-content:center; cursor:pointer;}
+  .scrim{display:none; position:fixed; inset:0; background:rgba(30,25,15,.35); z-index:25;}
+  .scrim.show{display:block;}
+}
+</style>
+</head>
+<body>
+<button class="menu-btn" id="menuBtn" aria-label="목록 열기">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#262420" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+</button>
+<div class="scrim" id="scrim"></div>
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><div class="logo">🎓 유튜브 대학</div><div class="sub">내 강의 서재 · 영상 → 이해 → 흡수</div></div>
+    <div class="search-wrap"><input class="search" id="search" type="search" placeholder="제목·태그·채널 검색…" autocomplete="off"></div>
+    <div class="cats" id="cats"></div>
+    <div class="count" id="count"></div>
+    <div class="list" id="list"><div class="item active" data-k="M7lc1UVf-VE"><img class="thumb" src="https://img.youtube.com/vi/M7lc1UVf-VE/mqdefault.jpg" loading="lazy" alt=""><div class="it-body"><div class="it-title">바이브코딩으로 1인 SaaS 만들기</div><div class="it-meta"><span class="dot-cat">AI</span><span>개발자 김코딩</span></div></div></div><div class="item" data-k="aqz-KE-bpKQ"><img class="thumb" src="https://img.youtube.com/vi/aqz-KE-bpKQ/mqdefault.jpg" loading="lazy" alt=""><div class="it-body"><div class="it-title">하루를 두 배로 쓰는 시간관리법</div><div class="it-meta"><span class="dot-cat">생산성</span><span>생산성 연구소</span></div></div></div></div>
+  </aside>
+  <main class="main" id="main"><div class="main-inner" id="content"><div class="detail-head"><h1>바이브코딩으로 1인 SaaS 만들기</h1><div class="row-meta"><span class="badge">AI</span><span class="meta-text">개발자 김코딩 · 1시간 15분 · 자막 한국어</span><a class="ext-link" href="https://www.youtube.com/watch?v=M7lc1UVf-VE" target="_blank" rel="noopener">원본 영상 ↗</a></div><div class="tags"><span class="tag">#바이브코딩</span><span class="tag">#1인창업</span><span class="tag">#SaaS</span><span class="tag">#Cursor</span></div></div><div class="video-box"><a class="poster" id="player" href="https://www.youtube.com/watch?v=M7lc1UVf-VE" target="_blank" rel="noopener" style="background-image:url('https://img.youtube.com/vi/M7lc1UVf-VE/hqdefault.jpg')"><span class="play-badge">&#9654;</span><span class="poster-note">유튜브에서 보기</span></a></div><div class="oneliner">AI 코딩 도구로 &#x27;반복&#x27;을 제거하면, 혼자서도 한 달 안에 결제까지 붙는 SaaS를 만들 수 있다.</div><div class="card"><h2>🧠 요약</h2><div class="summary">이 영상은 1인 개발자가 AI 코딩 도구(Cursor)를 활용해 아이디어를 실제 매출이 나는 SaaS로 만드는 전 과정을 다룬다. 무엇을: 작은 문제 하나를 푸는 MVP. 어떻게: 규칙 파일로 반복 프롬프트를 제거하고, 원가를 계산해 단위경제를 맞춘다. 결과: 26일 만에 Stripe 결제까지 연동.</div></div><div class="card explainer"><h2>📖 쉽게 풀어보기</h2><div class="prose"><p>먼저 &#x27;바이브코딩&#x27;이 뭔지부터 짚고 갈게요. 바이브코딩은 코드를 한 줄씩 직접 타이핑하기보다, AI에게 &#x27;무엇을 만들지&#x27;를 자연어로 지시하고 결과를 다듬어 나가는 방식이에요. 그래서 핵심은 코딩 실력보다 &#x27;무엇을, 어떤 순서로 시킬지&#x27;를 잘 설계하는 능력이 됩니다.</p><p>영상에서 가장 강조하는 건 &#x27;Cursor 규칙 파일&#x27;입니다. 규칙 파일은 AI에게 매번 반복해서 알려줘야 하는 전제(프로젝트 구조, 코딩 컨벤션, 사용 라이브러리 등)를 한 곳에 적어두는 설정이에요. 이걸 잘 만들어두면 같은 설명을 매번 반복하지 않아도 되니, 발표자는 생산성이 약 3배가 됐다고 말합니다. 즉 &#x27;반복 제거&#x27;가 곧 속도이자 레버리지라는 거죠.</p><p>그다음은 &#x27;단위경제&#x27;예요. 리포트 1건을 만들 때 드는 원가가 약 29원이라고 나오는데, 이건 &#x27;AI 호출 비용 ÷ 처리 건수&#x27;로 계산한 값입니다. 한 건당 원가를 알아야 가격을 얼마로 매길지, 이익이 남는지를 판단할 수 있어요. 마지막으로 Stripe Atlas로 결제·법인 설정을 붙여 26일 만에 &#x27;돈을 받을 수 있는 상태&#x27;까지 도달합니다.</p></div></div><div class="card"><h2>🧩 핵심 개념</h2><dl class="concepts"><div><dt>바이브코딩(Vibe Coding)</dt><dd>AI에게 자연어로 의도를 지시해 코드를 생성·수정하는 개발 방식. 타이핑보다 &#x27;지시 설계&#x27;가 중요해진다.</dd></div><div><dt>규칙 파일(Rules)</dt><dd>AI가 매번 참고할 프로젝트 전제·컨벤션을 적어둔 설정. 반복 설명을 없애 생산성을 끌어올린다.</dd></div><div><dt>단위경제(Unit Economics)</dt><dd>제품 1건당 원가와 수익 구조. 여기선 리포트 1건 ≈ 29원으로, 가격·수익성 판단의 기준.</dd></div><div><dt>Stripe Atlas</dt><dd>법인 설립과 결제 연동을 한 번에 처리해 주는 서비스. 빠르게 &#x27;결제 가능한 상태&#x27;를 만든다.</dd></div></dl></div><div class="card"><h2>🔗 논리 흐름</h2><ol class="logic"><li>혼자서는 시간이 부족하다 → 반복 작업부터 줄여야 한다.</li><li>규칙 파일로 AI에게 전제를 한 번만 알려주면 반복 설명이 사라진다(생산성 3배).</li><li>빠르게 MVP를 만들되, 리포트 1건 원가(≈29원)를 계산해 수익이 나는 구조인지 검증한다.</li><li>Stripe Atlas로 결제를 붙여 &#x27;돈 받는 상태&#x27;까지 26일 만에 도달한다.</li></ol></div><div class="card"><h2>📚 챕터</h2><ul><li><button class="jump" data-t="0"><span class="ts">0:00</span><span class="ch-body"><strong>왜 1인 SaaS인가</strong><span class="desc">혼자서도 가능한 이유와, 시간이라는 진짜 병목을 짚는다.</span></span></button></li><li><button class="jump" data-t="15"><span class="ts">0:15</span><span class="ch-body"><strong>Cursor 규칙 파일 세팅</strong><span class="desc">반복 프롬프트를 없애는 규칙 파일 작성법과 그 효과.</span></span></button></li><li><button class="jump" data-t="40"><span class="ts">0:40</span><span class="ch-body"><strong>배포와 결제 연동</strong><span class="desc">Stripe Atlas로 결제를 붙이고 26일 만에 매출 가능한 상태로.</span></span></button></li></ul></div><div class="card"><h2>⭐ 핵심 구간</h2><ul><li><button class="jump hl" data-t="10"><span class="ts star">★ 0:10</span><span class="ch-body"><strong>규칙 파일 하나가 생산성을 3배로 만든다</strong><span class="reason">왜 중요? 반복 설명 제거가 1인 개발의 핵심 레버리지임을 보여줌</span></span></button></li><li><button class="jump hl" data-t="30"><span class="ts star">★ 0:30</span><span class="ch-body"><strong>리포트 1건 원가 약 29원</strong><span class="reason">왜 중요? 가격·수익성 판단의 기준이 되는 구체 숫자</span></span></button></li></ul></div><div class="card"><h2>💡 인사이트</h2><div class="insight">도구의 화려함보다 &#x27;반복을 얼마나 제거했는가&#x27;가 1인 생산성을 가른다. 규칙 파일이 곧 자동화된 나의 분신이다.</div></div><div class="card"><h2>✅ 핵심 정리</h2><ul class="bullets"><li>AI에게 시킬 전제를 규칙 파일로 한 번에 정리한다.</li><li>제품 1건당 원가를 먼저 계산해 가격을 정한다.</li><li>결제 연동까지 마쳐야 &#x27;제품&#x27;이 된다 — 미루지 않는다.</li></ul></div><div class="card"><h2>❓ 복습 질문</h2><p class="qhint">답을 먼저 떠올려본 뒤 영상·스크립트에서 확인해 보세요.</p><ol class="review"><li>규칙 파일이 생산성을 높이는 원리를 한 문장으로 설명할 수 있는가?</li><li>내 아이디어의 &#x27;1건당 원가&#x27;는 어떻게 계산할 수 있을까?</li><li>MVP에서 결제 연동을 일찍 붙이는 것이 왜 중요한가?</li></ol></div></div></main>
+</div>
+<script>
+const LIBRARY = [{"video_id": "M7lc1UVf-VE", "url": "https://www.youtube.com/watch?v=M7lc1UVf-VE", "title": "바이브코딩으로 1인 SaaS 만들기", "category": "AI", "tags": ["바이브코딩", "1인창업", "SaaS", "Cursor"], "oneLiner": "AI 코딩 도구로 '반복'을 제거하면, 혼자서도 한 달 안에 결제까지 붙는 SaaS를 만들 수 있다.", "summary": "이 영상은 1인 개발자가 AI 코딩 도구(Cursor)를 활용해 아이디어를 실제 매출이 나는 SaaS로 만드는 전 과정을 다룬다. 무엇을: 작은 문제 하나를 푸는 MVP. 어떻게: 규칙 파일로 반복 프롬프트를 제거하고, 원가를 계산해 단위경제를 맞춘다. 결과: 26일 만에 Stripe 결제까지 연동.", "explainer": "먼저 '바이브코딩'이 뭔지부터 짚고 갈게요. 바이브코딩은 코드를 한 줄씩 직접 타이핑하기보다, AI에게 '무엇을 만들지'를 자연어로 지시하고 결과를 다듬어 나가는 방식이에요. 그래서 핵심은 코딩 실력보다 '무엇을, 어떤 순서로 시킬지'를 잘 설계하는 능력이 됩니다.\n\n영상에서 가장 강조하는 건 'Cursor 규칙 파일'입니다. 규칙 파일은 AI에게 매번 반복해서 알려줘야 하는 전제(프로젝트 구조, 코딩 컨벤션, 사용 라이브러리 등)를 한 곳에 적어두는 설정이에요. 이걸 잘 만들어두면 같은 설명을 매번 반복하지 않아도 되니, 발표자는 생산성이 약 3배가 됐다고 말합니다. 즉 '반복 제거'가 곧 속도이자 레버리지라는 거죠.\n\n그다음은 '단위경제'예요. 리포트 1건을 만들 때 드는 원가가 약 29원이라고 나오는데, 이건 'AI 호출 비용 ÷ 처리 건수'로 계산한 값입니다. 한 건당 원가를 알아야 가격을 얼마로 매길지, 이익이 남는지를 판단할 수 있어요. 마지막으로 Stripe Atlas로 결제·법인 설정을 붙여 26일 만에 '돈을 받을 수 있는 상태'까지 도달합니다.", "keyConcepts": [{"term": "바이브코딩(Vibe Coding)", "explain": "AI에게 자연어로 의도를 지시해 코드를 생성·수정하는 개발 방식. 타이핑보다 '지시 설계'가 중요해진다."}, {"term": "규칙 파일(Rules)", "explain": "AI가 매번 참고할 프로젝트 전제·컨벤션을 적어둔 설정. 반복 설명을 없애 생산성을 끌어올린다."}, {"term": "단위경제(Unit Economics)", "explain": "제품 1건당 원가와 수익 구조. 여기선 리포트 1건 ≈ 29원으로, 가격·수익성 판단의 기준."}, {"term": "Stripe Atlas", "explain": "법인 설립과 결제 연동을 한 번에 처리해 주는 서비스. 빠르게 '결제 가능한 상태'를 만든다."}], "logicFlow": ["혼자서는 시간이 부족하다 → 반복 작업부터 줄여야 한다.", "규칙 파일로 AI에게 전제를 한 번만 알려주면 반복 설명이 사라진다(생산성 3배).", "빠르게 MVP를 만들되, 리포트 1건 원가(≈29원)를 계산해 수익이 나는 구조인지 검증한다.", "Stripe Atlas로 결제를 붙여 '돈 받는 상태'까지 26일 만에 도달한다."], "chapters": [{"time": 0, "title": "왜 1인 SaaS인가", "desc": "혼자서도 가능한 이유와, 시간이라는 진짜 병목을 짚는다."}, {"time": 15, "title": "Cursor 규칙 파일 세팅", "desc": "반복 프롬프트를 없애는 규칙 파일 작성법과 그 효과."}, {"time": 40, "title": "배포와 결제 연동", "desc": "Stripe Atlas로 결제를 붙이고 26일 만에 매출 가능한 상태로."}], "highlights": [{"time": 10, "text": "규칙 파일 하나가 생산성을 3배로 만든다", "reason": "반복 설명 제거가 1인 개발의 핵심 레버리지임을 보여줌"}, {"time": 30, "text": "리포트 1건 원가 약 29원", "reason": "가격·수익성 판단의 기준이 되는 구체 숫자"}], "insight": "도구의 화려함보다 '반복을 얼마나 제거했는가'가 1인 생산성을 가른다. 규칙 파일이 곧 자동화된 나의 분신이다.", "takeaways": ["AI에게 시킬 전제를 규칙 파일로 한 번에 정리한다.", "제품 1건당 원가를 먼저 계산해 가격을 정한다.", "결제 연동까지 마쳐야 '제품'이 된다 — 미루지 않는다."], "reviewQuestions": ["규칙 파일이 생산성을 높이는 원리를 한 문장으로 설명할 수 있는가?", "내 아이디어의 '1건당 원가'는 어떻게 계산할 수 있을까?", "MVP에서 결제 연동을 일찍 붙이는 것이 왜 중요한가?"], "uploader": "개발자 김코딩", "duration": 4520, "subtitle_lang": "한국어", "transcript": [{"t": 0, "x": "안녕하세요, 오늘은 혼자서 SaaS를 만드는 과정을 보여드릴게요."}, {"t": 10, "x": "규칙 파일을 만들면 반복 작업이 크게 줄어 생산성이 3배가 됩니다."}, {"t": 30, "x": "리포트 한 건을 만드는 원가는 약 29원 정도였어요."}, {"t": 40, "x": "마지막으로 Stripe Atlas로 결제를 붙였고 26일이 걸렸습니다."}], "addedAt": "2026-05-29"}, {"video_id": "aqz-KE-bpKQ", "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ", "title": "하루를 두 배로 쓰는 시간관리법", "category": "생산성", "tags": ["시간관리", "딥워크"], "chapters": [{"time": 0, "title": "오프닝", "desc": "바쁨의 함정"}, {"time": 20, "title": "타임블로킹", "desc": "90분 집중"}], "highlights": [{"time": 25, "text": "90분 집중 + 20분 휴식", "reason": "울트라디안 리듬"}], "summary": "타임블로킹과 딥워크로 시간을 통제.", "insight": "할 일이 아니라 시간에 일을 배치하라.", "actionItems": ["오전 90분 딥워크 예약", "알림 끄기"], "uploader": "생산성 연구소", "duration": 1260, "subtitle_lang": "한국어", "addedAt": "2026-05-29"}];
+const BUILT = "2026-05-29 01:56";
+const HTTP_MODE = (location.protocol === 'http:' || location.protocol === 'https:');
+const FILE_MODE = !HTTP_MODE;
+let activeKey=null, activeCat="전체", query="", activeTab="learn";
+let ytPlayer=null, ytReady=false, pendingCue=null;
+function keyOf(v){ return v.video_id||v.url||""; }
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g,c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+function paras(t){ return esc(t).split("\n\n").filter(p=>p.trim()).map(p=>`<p>${p.replace(/\n/g,"<br>")}</p>`).join(""); }
+function fmtTs(sec){ sec=parseInt(sec,10)||0; const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+  return h? h+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0") : m+":"+String(s).padStart(2,"0"); }
+function fmtDur(sec){ if(!sec) return ""; sec=parseInt(sec,10); const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60); return h? h+"시간 "+m+"분" : m+"분"; }
+function watchUrl(vid,t){ return "https://www.youtube.com/watch?v="+vid+(t?("&t="+t+"s"):""); }
+
+if(HTTP_MODE){ const tag=document.createElement('script'); tag.src="https://www.youtube.com/iframe_api"; document.head.appendChild(tag); }
+window.onYouTubeIframeAPIReady=function(){ ytReady=true; if(pendingCue){ const c=pendingCue; pendingCue=null; mountPlayer(c.vid,c.start); } };
+function mountPlayer(vid,start){
+  start=parseInt(start,10)||0;
+  if(!HTTP_MODE||!vid) return;
+  if(!ytReady||!window.YT||!YT.Player){ pendingCue={vid:vid,start:start}; return; }
+  if(!document.getElementById('player')) return;
+  if(ytPlayer&&ytPlayer.destroy){ try{ ytPlayer.destroy(); }catch(e){} ytPlayer=null; }
+  ytPlayer=new YT.Player('player',{ videoId:vid,
+    playerVars:{ rel:0, modestbranding:1, enablejsapi:1, playsinline:1, start:start, origin:location.origin },
+    events:{ onReady:(e)=>{ if(start) e.target.playVideo(); } } });
+}
+function playerMarkup(v){
+  if(!v.video_id) return "";
+  if(HTTP_MODE) return `<div id="player"></div>`;
+  const thumb="https://img.youtube.com/vi/"+v.video_id+"/hqdefault.jpg";
+  return `<a class="poster" id="player" href="${watchUrl(v.video_id,0)}" target="_blank" rel="noopener" style="background-image:url('${thumb}')"><span class="play-badge">&#9654;</span><span class="poster-note">유튜브에서 보기</span></a>`;
+}
+function seekTo(t){
+  t=parseInt(t,10)||0;
+  const v=LIBRARY.find(x=>keyOf(x)===activeKey);
+  if(!v||!v.video_id) return;
+  if(HTTP_MODE){ if(ytPlayer&&ytPlayer.seekTo){ ytPlayer.seekTo(t,true); ytPlayer.playVideo(); } else { mountPlayer(v.video_id,t); }
+    document.getElementById('main').scrollTo({top:0,behavior:'smooth'}); }
+  else { window.open(watchUrl(v.video_id,t),"_blank","noopener"); }
+}
+
+function categories(){ return ["전체",...Array.from(new Set(LIBRARY.map(v=>v.category||"기타")))]; }
+function filtered(){
+  const q=query.trim().toLowerCase();
+  return LIBRARY.filter(v=>{
+    if(activeCat!=="전체"&&(v.category||"기타")!==activeCat) return false;
+    if(!q) return true;
+    return [v.title,v.category,v.uploader,(v.tags||[]).join(" "),v.summary,v.explainer].join(" ").toLowerCase().includes(q);
+  });
+}
+function renderCats(){
+  const el=document.getElementById('cats');
+  el.innerHTML=categories().map(c=>`<span class="cat-chip ${c===activeCat?'on':''}" data-cat="${esc(c)}">${esc(c)}</span>`).join("");
+  el.querySelectorAll('.cat-chip').forEach(ch=>ch.onclick=()=>{ activeCat=ch.dataset.cat; renderCats(); renderList(); });
+}
+function renderList(){
+  const rows=filtered();
+  document.getElementById('count').textContent=rows.length+"개 강의";
+  const el=document.getElementById('list');
+  if(!rows.length){ el.innerHTML=`<div class="empty-list">결과가 없습니다.</div>`; return; }
+  el.innerHTML=rows.map(v=>{
+    const k=keyOf(v);
+    const thumb=v.video_id?`https://img.youtube.com/vi/${esc(v.video_id)}/mqdefault.jpg`:"";
+    return `<div class="item ${k===activeKey?'active':''}" data-k="${esc(k)}">
+      ${thumb?`<img class="thumb" src="${thumb}" loading="lazy" alt="">`:`<div class="thumb"></div>`}
+      <div class="it-body"><div class="it-title">${esc(v.title||"제목 없음")}</div>
+      <div class="it-meta"><span class="dot-cat">${esc(v.category||"기타")}</span>${v.uploader?`<span>${esc(v.uploader)}</span>`:""}</div></div></div>`;
+  }).join("");
+  el.querySelectorAll('.item').forEach(it=>it.onclick=()=>{ select(it.dataset.k); closeSide(); });
+}
+
+function card(title, inner){ return inner? `<div class="card"><h2>${title}</h2>${inner}</div>` : ""; }
+function jumpList(arr, isHl){
+  return arr.map(o=>{
+    const t=parseInt((isHl?o.time:o.time)||0,10);
+    if(isHl) return `<li><button class="jump hl" data-t="${t}"><span class="ts star">★ ${fmtTs(t)}</span><span class="ch-body"><strong>${esc(o.text||"")}</strong><span class="reason">왜 중요? ${esc(o.reason||"")}</span></span></button></li>`;
+    return `<li><button class="jump" data-t="${t}"><span class="ts">${fmtTs(t)}</span><span class="ch-body"><strong>${esc(o.title||"")}</strong><span class="desc">${esc(o.desc||"")}</span></span></button></li>`;
+  }).join("");
+}
+function learnPanel(v){
+  let h="";
+  if(v.oneLiner) h+=`<div class="oneliner">${esc(v.oneLiner)}</div>`;
+  h+=card("🧠 요약", v.summary?`<div class="summary">${esc(v.summary)}</div>`:"");
+  h+=card("📖 쉽게 풀어보기", v.explainer?`<div class="prose">${paras(v.explainer)}</div>`:"") .replace('class="card"','class="card explainer"');
+  if(v.keyConcepts&&v.keyConcepts.length){
+    h+=card("🧩 핵심 개념", `<dl class="concepts">`+v.keyConcepts.map(c=>`<div><dt>${esc(c.term||"")}</dt><dd>${esc(c.explain||c.desc||"")}</dd></div>`).join("")+`</dl>`);
+  }
+  if(v.logicFlow&&v.logicFlow.length){
+    h+=card("🔗 논리 흐름", `<ol class="logic">`+v.logicFlow.map(s=>`<li>${esc(typeof s==="string"?s:(s.text||""))}</li>`).join("")+`</ol>`);
+  }
+  if(v.chapters&&v.chapters.length) h+=card("📚 챕터", `<ul>${jumpList(v.chapters,false)}</ul>`);
+  if(v.highlights&&v.highlights.length) h+=card("⭐ 핵심 구간", `<ul>${jumpList(v.highlights,true)}</ul>`);
+  h+=card("💡 인사이트", v.insight?`<div class="insight">${esc(v.insight)}</div>`:"");
+  const take=v.takeaways||v.actionItems||[];
+  if(take.length) h+=card("✅ 핵심 정리", `<ul class="bullets">`+take.map(t=>`<li>${esc(t)}</li>`).join("")+`</ul>`);
+  if(v.reviewQuestions&&v.reviewQuestions.length){
+    h+=card("❓ 복습 질문", `<p class="qhint">답을 먼저 떠올려본 뒤 영상·스크립트에서 확인해 보세요.</p><ol class="review">`+v.reviewQuestions.map(q=>`<li>${esc(q)}</li>`).join("")+`</ol>`);
+  }
+  return h;
+}
+function scriptPanel(v){
+  const tr=v.transcript||[];
+  if(!tr.length) return `<div class="card"><div class="empty">이 영상은 스크립트가 없습니다.</div></div>`;
+  const lines=tr.map(r=>`<button class="tline" data-t="${r.t}"><span class="tts">${fmtTs(r.t)}</span><span>${esc(r.x)}</span></button>`).join("");
+  return `<input class="tsearch" id="tsearch" type="search" placeholder="스크립트 안에서 검색…" autocomplete="off"><div class="tlist" id="tlist">${lines}</div>`;
+}
+function detailHtml(v){
+  const tags=(v.tags||[]).map(t=>`<span class="tag">#${esc(t)}</span>`).join("");
+  const metaBits=[v.uploader,fmtDur(v.duration),v.subtitle_lang?"자막 "+esc(v.subtitle_lang):""].filter(Boolean).map(esc).join(" · ");
+  return `<div class="detail-head"><h1>${esc(v.title||"제목 없음")}</h1>
+      <div class="row-meta"><span class="badge">${esc(v.category||"기타")}</span>
+        ${metaBits?`<span class="meta-text">${metaBits}</span>`:""}
+        ${v.url?`<a class="ext-link" href="${esc(v.url)}" target="_blank" rel="noopener">원본 영상 ↗</a>`:""}</div>
+      <div class="tags">${tags}</div></div>
+    <div class="video-box">${playerMarkup(v)}</div>
+    ${(FILE_MODE&&v.video_id)?`<div class="player-hint">파일로 열려 페이지 안 재생이 제한됩니다. 같은 폴더의 <code>재생서버.command</code> 더블클릭(또는 <code>python3 run.py serve</code>)으로 열면 영상이 <b>페이지 안에서</b> 재생되고 구간 클릭 시 해당 지점부터 재생됩니다.</div>`:""}
+    <div class="tabs">
+      <button class="tab-btn ${activeTab==='learn'?'on':''}" data-tab="learn">학습</button>
+      <button class="tab-btn ${activeTab==='script'?'on':''}" data-tab="script">스크립트</button>
+    </div>
+    <div class="tab-panel ${activeTab==='learn'?'on':''}" data-panel="learn">${learnPanel(v)}</div>
+    <div class="tab-panel ${activeTab==='script'?'on':''}" data-panel="script">${scriptPanel(v)}</div>
+    <div class="foot">유튜브 대학 · 마지막 빌드 ${esc(BUILT)} · 총 ${LIBRARY.length}개 강의</div>`;
+}
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('on',p.dataset.panel===t));
+}
+function bindDetail(){
+  const root=document.getElementById('content');
+  root.querySelectorAll('.tab-btn').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+  root.querySelectorAll('.jump,.tline').forEach(b=>b.onclick=()=>seekTo(b.dataset.t));
+  const ts=root.querySelector('#tsearch');
+  if(ts) ts.oninput=()=>{ const q=ts.value.trim().toLowerCase();
+    root.querySelectorAll('#tlist .tline').forEach(l=>{ const hit=!q||l.textContent.toLowerCase().includes(q); l.classList.toggle('hide',!hit); }); };
+}
+function select(k){
+  const v=LIBRARY.find(x=>keyOf(x)===k); if(!v) return;
+  activeKey=k;
+  document.getElementById('content').innerHTML=detailHtml(v);
+  document.querySelectorAll('.item').forEach(it=>it.classList.toggle('active',it.dataset.k===k));
+  bindDetail();
+  if(HTTP_MODE&&v.video_id) mountPlayer(v.video_id,0);
+  document.getElementById('main').scrollTo({top:0});
+}
+function openSide(){ document.getElementById('side').classList.add('open'); document.getElementById('scrim').classList.add('show'); }
+function closeSide(){ document.getElementById('side').classList.remove('open'); document.getElementById('scrim').classList.remove('show'); }
+function init(){
+  document.getElementById('search').addEventListener('input',e=>{ query=e.target.value; renderList(); });
+  document.getElementById('menuBtn').onclick=openSide;
+  document.getElementById('scrim').onclick=closeSide;
+  renderCats(); renderList();
+  if(LIBRARY.length){ const s=[...LIBRARY].sort((a,b)=>(b.addedAt||"").localeCompare(a.addedAt||"")); select(keyOf(s[0])); }
+}
+init();
+</script>
+</body>
+</html>
