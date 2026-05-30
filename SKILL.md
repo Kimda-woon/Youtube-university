@@ -31,6 +31,7 @@ description: |
 ```
 /Users/dawoonkim/Desktop/Youtube-university/
 ├── youtube-univ.html        # 정적 서재 (템플릿 1개, 처음 1회만 생성/갱신)
+├── index.html               # youtube-univ.html 복사본 (GitHub Pages 서빙용, 배포 시 자동 동기화)
 ├── library.js               # window.YTU_LIBRARY = [...]  (자동 생성)
 ├── library.json             # 분석 누적 원본 (자동 생성)
 ├── transcripts/
@@ -170,14 +171,33 @@ HTML="/Users/dawoonkim/Desktop/Youtube-university/youtube-univ.html"
 
 HTML은 `library.js`를 읽고, 자막은 사용자가 [스크립트] 탭을 열 때 `transcripts/<id>.js`를 늦게 로드한다. 그래서 **새 강의가 추가돼도 HTML 자체는 바뀌지 않는다.** (템플릿 자체를 개선할 때만 교체)
 
-### 로컬 백업 + GitHub Pages 배포
+### index.html 동기화 (GitHub Pages용)
+
+GitHub Pages는 `index.html`을 서빙한다. 배포 전에 항상 `youtube-univ.html`을 `index.html`로 복사해야 한다.
 
 ```bash
 REPO="/Users/dawoonkim/Desktop/Youtube-university"
 cd "$REPO"
 
+cp youtube-univ.html index.html
+```
+
+### Git 저장소 확인 + 배포
+
+저장소가 초기화되지 않은 경우(`.git` 폴더 없음) git init부터 수행한다.
+
+```bash
+# Git 저장소가 없으면 초기화 + 원격 연결
+if [ ! -d ".git" ]; then
+  git init
+  git branch -M main
+  git remote add origin https://github.com/Kimda-woon/Youtube-university.git
+  git fetch origin
+  git reset --mixed origin/main 2>/dev/null || true
+fi
+
 # HTML 템플릿을 교체한 경우에만 직전 버전 백업
-if git diff --quiet -- youtube-univ.html; then :; else
+if git diff --quiet -- youtube-univ.html 2>/dev/null; then :; else
   mkdir -p backups
   cp youtube-univ.html "backups/youtube-univ_$(date +%Y%m%d_%H%M%S).html" 2>/dev/null || true
 fi
@@ -210,6 +230,8 @@ git push origin main
 3. **타임스탬프 추측 금지.** `transcripts/<id>.json`의 실제 start 값만 사용.
 4. **자막 없이 분석 금지.** 자동 추출·복붙 모두 실패하면 분석하지 않고 사용자에게 알린다. 웹 검색/설명란으로 대체 금지.
 5. **upsert 순서 준수:** 자막 저장 → 분석 → library upsert → HTML 확인 → 배포.
+6. **`.player-wrap`에 `position:sticky` 사용 금지.** 영상이 스크롤 시 상단에 고정되면 아래 콘텐츠(인사이트·챕터 등)를 가려 읽을 수 없다. 모바일 미디어쿼리에서 `position:static`으로 해제하더라도 데스크톱에서 문제가 발생한다.
+7. **배포 시 `index.html` 동기화 필수.** `youtube-univ.html`을 `index.html`로 복사하지 않으면 GitHub Pages에서 404가 발생한다. 배포 스크립트(`배포.command`)와 STEP 4 모두 이 동기화를 포함해야 한다.
 
 ---
 
