@@ -19,6 +19,17 @@ if [ ! -f "youtube-univ.html" ]; then
   exit 1
 fi
 
+# Git 저장소가 없으면 초기화 + 원격 연결
+if [ ! -d ".git" ]; then
+  echo "🔧 Git 저장소 초기화 중..."
+  git init
+  git branch -M main
+  git remote add origin https://github.com/Kimda-woon/Youtube-university.git
+  git fetch origin 2>/dev/null
+  git reset --mixed origin/main 2>/dev/null || true
+  echo "✅ Git 저장소 초기화 완료"
+fi
+
 # youtube-univ.html → index.html 동기화 (GitHub Pages용)
 cp youtube-univ.html index.html
 echo "📄 index.html 동기화 완료"
